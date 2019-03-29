@@ -1,3 +1,217 @@
-test
-:wq
+<html lang="en" ng-app="demoApp">
 
+  <head>
+    
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Demo</title>
+    
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://rawgit.com/daniel-nagy/md-data-table/master/dist/md-data-table.css">
+    
+  </head>
+
+  <body layout="column">
+    
+    <md-toolbar class="md-whiteframe-1dp">
+      <div class="md-toolbar-tools">
+        <div class="md-title">Material Design Data Table For farusta</div>
+      </div>
+    </md-toolbar>
+    
+    <md-content laout="column" flex ng-controller="nutritionController">
+      
+      <!-- <md-card>
+        <div layout="row" layout-wrap class="checkboxes">
+          <md-checkbox ng-model="options.rowSelection">Row Selection</md-checkbox>
+          <md-checkbox ng-model="options.multiSelect">Multiple Selection</md-checkbox>
+          <md-checkbox ng-model="options.autoSelect">Auto Selection</md-checkbox>
+          <md-checkbox ng-model="options.decapitate">Decapitate</md-checkbox>
+          <md-checkbox ng-model="options.largeEditDialog">Lard Edit Dialogs</md-checkbox>
+          <md-checkbox ng-model="options.boundaryLinks">Pagination Boundary Links</md-checkbox>
+          <md-checkbox ng-model="options.limitSelect" ng-click="toggleLimitOptions()">Pagination Limit Select</md-checkbox>
+          <md-checkbox ng-model="options.pageSelect">Pagination Page Select</md-checkbox>
+        </div>
+      </md-card> -->
+      
+      <md-card>
+        
+        <md-toolbar class="md-table-toolbar md-default" ng-hide="options.rowSelection && selected.length">
+          <div class="md-toolbar-tools">
+            <span>Test For Renuka</span>
+            <div flex></div>
+            <md-button class="md-icon-button" ng-click="loadStuff()">
+              <md-icon>refresh</md-icon>
+            </md-button>
+          </div>
+        </md-toolbar>
+        
+        <md-toolbar class="md-table-toolbar alternate" ng-show="options.rowSelection && selected.length">
+          <div class="md-toolbar-tools">
+            <span>{{selected.length}} {{selected.length > 1 ? 'items' : 'item'}} selected</span>
+          </div>
+        </md-toolbar>
+        
+        <md-table-container>
+          <table md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}" ng-model="selected" md-progress="promise">
+            <thead ng-if="!options.decapitate" md-head md-order="query.order" md-on-reorder="logOrder">
+              <tr md-row>
+                <th md-column md-order-by="Business"><span>Business</span></th>
+                <th md-column md-order-by="Currency"><span>Currency</span></th>
+                <th md-column md-numeric md-order-by="calories.value" md-desc><span>SPOT</span></th>
+                <th md-column md-numeric md-order-by="Today"><span>Today</span></th>
+                <th md-column md-numeric md-order-by="protein.value"><span>TOMORROW</span></th>
+                <th md-column md-numeric md-order-by="TOMORROW" hide-gt-xs show-gt-md><span>1M</span></th>
+                <th md-column md-numeric md-order-by="calcium.value" hide-gt-xs show-gt-lg><span>1W</span></th>
+                <th md-column md-numeric md-order-by="iron.value" hide-gt-xs show-gt-lg><span>1Y</span></th>
+                <th md-column md-order-by="comment">
+                  <md-icon>comments</md-icon>
+                  <span>3M</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody md-body>
+              <tr md-row md-select="dessert" md-on-select="logItem" md-auto-select="options.autoSelect" ng-disabled="dessert.calories.value > 400" ng-repeat="dessert in desserts.data | filter: filter.search | orderBy: query.order | limitTo: query.limit : (query.page -1) * query.limit">
+                <td md-cell>{{dessert.Business}}</td>
+                <td md-cell>
+                        {{dessert.Currency}}
+                  <!-- <md-select ng-model="dessert.type" placeholder="Other">
+                    <md-option ng-value="type" ng-repeat="type in getTypes()">{{type}}</md-option>
+                  </md-select> -->
+                </td>
+                <td md-cell>{{dessert.SPOT}}</td>
+                <td md-cell>{{dessert.Today}}</td>
+                <td md-cell>{{dessert.TOMORROW}}</td>
+                <td md-cell>{{dessert.protein.value | number: 2}}</td>
+                <td md-cell hide-gt-xs show-gt-md>{{dessert.sodium.value}}</td>
+                <td md-cell hide-gt-xs show-gt-lg>{{dessert.calcium.value}}%</td>
+                <td md-cell hide-gt-xs show-gt-lg>{{dessert.iron.value}}%</td>
+                <td md-cell ng-click="editComment($event, dessert)" ng-class="{'md-placeholder': !dessert.comment}">
+                  {{dessert.comment || 'Add a comment'}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </md-table-container>
+
+        <md-table-pagination md-limit="query.limit" md-limit-options="limitOptions" md-page="query.page" md-total="{{desserts.count}}" md-page-select="options.pageSelect" md-boundary-links="options.boundaryLinks" md-on-paginate="logPagination"></md-table-pagination>
+      </md-card>
+    </md-content>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+    <script src="https://rawgit.com/daniel-nagy/md-data-table/master/dist/md-data-table.js"></script>
+    <script>
+    angular.module('demoApp', ['ngMaterial', 'md.data.table'])
+
+.config(['$mdThemingProvider', function ($mdThemingProvider) {
+    'use strict';
+    
+    $mdThemingProvider.theme('default')
+      .primaryPalette('blue');
+}])
+
+.controller('nutritionController', ['$mdEditDialog', '$q', '$scope', '$timeout', function ($mdEditDialog, $q, $scope, $timeout) {
+  'use strict';
+  
+  $scope.selected = [];
+  $scope.limitOptions = [5, 10, 15];
+  
+  $scope.options = {
+    rowSelection: true,
+    multiSelect: true,
+    autoSelect: true,
+    decapitate: false,
+    largeEditDialog: false,
+    boundaryLinks: false,
+    limitSelect: true,
+    pageSelect: true
+  };
+  
+  $scope.query = {
+    order: 'name',
+    limit: 5,
+    page: 1
+  };
+  
+  $scope.desserts = {
+    "count": 9,
+    "data": [{"Business": "BusinessDummy", "1W": "0.0", "1Y": "-5481.6", "SPOT": "0.0", "6M": "0.0", "Currency": "AUD", "3M": "-100228.85999999999", "1M": "0.0", "TOMORROW": "0.0", "Today": "-184971044.80999917"}, {"Business": "BusinessDummy", "1W": "0.0", "1Y": "0.0", "SPOT": "0.0", "6M": "0.0", "Currency": "EUR", "3M": "0.0", "1M": "0.0", "TOMORROW": "0.0", "Today": "-107675024.70940009"}, {"Business": "BusinessDummy", "1W": "0.0", "1Y": "0.0", "SPOT": "0.0", "6M": "0.0", "Currency": "GBP", "3M": "0.0", "1M": "0.0", "TOMORROW": "0.0", "Today": "-11211.252321000007"}, {"Business": "BusinessDummy", "1W": "0.0", "1Y": "0.0", "SPOT": "0.0", "6M": "0.0", "Currency": "NZD", "3M": "0.0", "1M": "0.0", "TOMORROW": "0.0", "Today": "-125240.64630000014"}, {"Business": "BusinessDummy", "1W": "0.0", "1Y": "0.0", "SPOT": "0.0", "6M": "0.0", "Currency": "USD", "3M": "0.0", "1M": "0.0", "TOMORROW": "0.0", "Today": "-1536.6417110000039"}, {"Business": "Treasury Money Markets", "1W": "-256904460.59999993", "1Y": "-705779821.2999997", "SPOT": "-23265589.03", "6M": "-3155900527.3400016", "Currency": "AUD", "3M": "-2441618115.0100017", "1M": "-1146599002.4799998", "TOMORROW": "-62151960.59", "Today": "5548891680.699981"}, {"Business": "Treasury Money Markets", "1W": "0.0", "1Y": "0.0", "SPOT": "0.0", "6M": "0.0", "Currency": "EUR", "3M": "0.0", "1M": "236405.1246", "TOMORROW": "0.0", "Today": "-739295704.9546986"}, {"Business": "Treasury Money Markets", "1W": "0.0", "1Y": "0.0", "SPOT": "0.0", "6M": "0.0", "Currency": "GBP", "3M": "-429327.34744100005", "1M": "-200007.990591", "TOMORROW": "0.0", "Today": "-15697268.029023672"}, {"Business": "Treasury Money Markets", "1W": "0.0", "1Y": "0.0", "SPOT": "0.0", "6M": "0.0", "Currency": "HKD", "3M": "0.0", "1M": "0.0", "TOMORROW": "0.0", "Today": "-187396914.63280255"}, {"Business": "Treasury Money Markets", "1W": "0.0", "1Y": "0.0", "SPOT": "0.0", "6M": "0.0", "Currency": "JPY", "3M": "0.0", "1M": "0.0", "TOMORROW": "0.0", "Today": "2827628201324.913"}, {"Business": "Treasury Money Markets", "1W": "0.0", "1Y": "0.0", "SPOT": "0.0", "6M": "0.0", "Currency": "NOK", "3M": "0.0", "1M": "0.0", "TOMORROW": "0.0", "Today": "-4747652.514020001"}, {"Business": "Treasury Money Markets", "1W": "0.0", "1Y": "0.0", "SPOT": "0.0", "6M": "0.0", "Currency": "NZD", "3M": "0.0", "1M": "0.0", "TOMORROW": "0.0", "Today": "-3358062.540413998"}, {"Business": "Treasury Money Markets", "1W": "0.0", "1Y": "0.0", "SPOT": "0.0", "6M": "0.0", "Currency": "PGK", "3M": "0.0", "1M": "0.0", "TOMORROW": "0.0", "Today": "1834351.1636537462"}, {"Business": "Treasury Money Markets", "1W": "0.0", "1Y": "0.0", "SPOT": "0.0", "6M": "0.0", "Currency": "SGD", "3M": "0.0", "1M": "0.0", "TOMORROW": "0.0", "Today": "-3325.5900000000256"}, {"Business": "Treasury Money Markets", "1W": "0.0", "1Y": "-229392.23027300002", "SPOT": "0.0", "6M": "-35954.895893", "Currency": "USD", "3M": "-1730113.33853", "1M": "-886200.1339850001", "TOMORROW": "32005228.559205987", "Today": "-2161271550.03324"}]
+  };
+  
+  $scope.editComment = function (event, dessert) {
+    event.stopPropagation(); // in case autoselect is enabled
+    
+    var editDialog = {
+      modelValue: dessert.comment,
+      placeholder: 'Add a comment',
+      save: function (input) {
+        if(input.$modelValue === 'Donald Trump') {
+          input.$invalid = true;
+          return $q.reject();
+        }
+        if(input.$modelValue === 'Bernie Sanders') {
+          return dessert.comment = 'FEEL THE BERN!'
+        }
+        dessert.comment = input.$modelValue;
+      },
+      targetEvent: event,
+      title: 'Add a comment',
+      validators: {
+        'md-maxlength': 30
+      }
+    };
+    
+    var promise;
+    
+    if($scope.options.largeEditDialog) {
+      promise = $mdEditDialog.large(editDialog);
+    } else {
+      promise = $mdEditDialog.small(editDialog);
+    }
+    
+    promise.then(function (ctrl) {
+      var input = ctrl.getInput();
+      
+      input.$viewChangeListeners.push(function () {
+        input.$setValidity('test', input.$modelValue !== 'test');
+      });
+    });
+  };
+  
+  $scope.toggleLimitOptions = function () {
+    $scope.limitOptions = $scope.limitOptions ? undefined : [5, 10, 15];
+  };
+  
+  $scope.getTypes = function () {
+    return ['Candy', 'Ice cream', 'Other', 'Pastry'];
+  };
+  
+  $scope.loadStuff = function () {
+    $scope.promise = $timeout(function () {
+      // loading
+    }, 2000);
+  }
+  
+  $scope.logItem = function (item) {
+    console.log(item.name, 'was selected');
+  };
+  
+  $scope.logOrder = function (order) {
+    console.log('order: ', order);
+  };
+  
+  $scope.logPagination = function (page, limit) {
+    console.log('page: ', page);
+    console.log('limit: ', limit);
+  }
+}]);
+</script>
+    
+  </body>
+</html>
