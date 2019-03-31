@@ -1,0 +1,182 @@
+<html lang="en" ng-app="mainApp">
+
+  <head>
+    
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Centralized Cash Management</title>
+    
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://rawgit.com/daniel-nagy/md-data-table/master/dist/md-data-table.css">
+    
+  </head>
+
+  <body layout="column" ng-controller="mainController">
+    <div layout="row" >
+      <div  flex="60">
+          <!-- table caseBlotterHeader-->
+          <md-content laout="column" flex >
+              <md-card> 
+                <md-toolbar class="md-table-toolbar md-default" ng-hide="options.rowSelection && selected.length">
+                  <div class="md-toolbar-tools">
+                    <span>CASH BLOTTER</span> 
+                    <!-- <div flex></div> -->
+                    <md-button class="md-icon-button" ng-click="loadStuff()">
+                      <md-icon>refresh</md-icon>
+                    </md-button>
+                  </div>
+                </md-toolbar>
+                <md-table-container>
+                  <table md-table  ng-model="selected" md-progress="promise">
+                    <thead ng-if="!options.decapitate" md-head md-order="query.order" md-on-reorder="logOrder">
+                      <tr md-row >
+                        <th md-column ng-mouseover="test()" ng-repeat="header in caseBlotterHeader" md-order-by="{{header}}"><span>{{header}}</span></th>
+                      <!--   <th md-column md-order-by="Currency"><span>{{header.name}}</span></th>
+                        <th md-column md-numeric md-order-by="calories.value" md-desc><span>{{header.name}}</span></th>
+                        <th md-column md-numeric md-order-by="Today"><span>{{header.name}}</span></th>
+                        <th md-column md-numeric md-order-by="protein.value"><span>{{header.name}}</span></th>
+                        <th md-column md-numeric md-order-by="TOMORROW"><span>{{header.name}}</span></th>
+                        <th md-column md-numeric md-order-by="calcium.value"><span>{{header.name}}</span></th>
+                        <th md-column md-numeric md-order-by="iron.value"><span>{{header.name}}</span></th>
+                        <th  md-column md-numeric md-order-by="iron.value">
+                          <span>{{header.name}}</span>
+                        </th> -->
+                      </tr>
+                    </thead>
+                    <tbody md-body>
+                      <tr md-row md-on-select="logItem" md-auto-select="options.autoSelect"  ng-repeat="cashBlotter in CashBlotterData.data | filter: filter.search | orderBy: query.order | limitTo: query.limit : (query.page -1) * query.limit">
+                        <td md-cell ng-click="onclickCaseBoltter(cashBlotter.Business)">{{cashBlotter.Business}}</td>
+                        <td md-cell ng-click="onclickCaseBoltter(cashBlotter.Business)" ng-dblclick="onDbCaseBoltter(cashBlotter.Currency)">{{cashBlotter.Currency}}</td>
+                        <td md-cell ng-click="onclickCaseBoltter(cashBlotter.Business)" ng-dblclick="onDbCaseBoltter(cashBlotter.Business, cashBlotter.SPOT, 'SPOT')">{{cashBlotter.SPOT}}</td>
+                        <td md-cell ng-click="onclickCaseBoltter(cashBlotter.Business)" ng-dblclick="onDbCaseBoltter(cashBlotter.Business, cashBlotter.Today, 'Today')">{{cashBlotter.Today}}</td>
+                        <td md-cell ng-click="onclickCaseBoltter(cashBlotter.Business)" ng-dblclick="onDbCaseBoltter(cashBlotter.Business, cashBlotter.TOMORROW, 'TOMORROW')">{{cashBlotter.TOMORROW}}</td>
+                        <td md-cell ng-click="onclickCaseBoltter(cashBlotter.Business)" ng-dblclick="onDbCaseBoltter(cashBlotter.Business, cashBlotter.Business, '1M')">{{cashBlotter['1M']}}</td>
+                        <td md-cell ng-click="onclickCaseBoltter(cashBlotter.Business)" ng-dblclick="onDbCaseBoltter(cashBlotter.Business, cashBlotter.Business, '1W')">{{cashBlotter['1W']}}</td>
+                        <td md-cell ng-click="onclickCaseBoltter(cashBlotter.Business)" ng-dblclick="onDbCaseBoltter(cashBlotter.Business, cashBlotter.Business, '1Y')">{{cashBlotter['1Y']}}</td>
+                        <td md-cell ng-click="onclickCaseBoltter(cashBlotter.Business)" ng-dblclick="onDbCaseBoltter(cashBlotter.Business, cashBlotter.Business, '3M')">{{cashBlotter['3M']}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </md-table-container>
+                <md-table-pagination md-limit="query.limit" md-limit-options="limitOptions" md-page="query.page" md-total="{{cashBlotterData.count}}" md-page-select="options.pageSelect" md-boundary-links="options.boundaryLinks" md-on-paginate="logPagination"></md-table-pagination>
+              </md-card>
+          </md-content>
+          <!--end table caseBlotterHeader-->
+      </div>
+      <div flex="40" ng-if="strategiesFlag">
+        <!-- start STRATEGIES table -->
+        <md-content laout="column" flex >
+            <md-card> 
+              <md-toolbar class="md-table-toolbar md-default" ng-hide="options.rowSelection && selected.length">
+                <div class="md-toolbar-tools">
+                  <span>STRATEGIES</span>
+                  <div flex></div>
+                  <md-button class="md-icon-button" ng-click="loadStuff()">
+                    <md-icon>refresh</md-icon>
+                  </md-button>
+                </div>
+              </md-toolbar>
+              <md-table-container>
+                <table md-table  ng-model="selected" md-progress="promise">
+                  <thead ng-if="!options.decapitate" md-head md-order="query.order" md-on-reorder="logOrder">
+                    <tr md-row >
+                      <th md-column md-order-by="{{header}}" ng-mouseover="test()" ng-repeat="header in strategiesHeader"><span>{{header}}</span></th>
+                    </tr>
+                  </thead>
+                  <tbody md-body>
+                    <tr md-row md-on-select="logItem" md-auto-select="options.autoSelect" ng-disabled="startgies.calories.value > 400" ng-repeat="startgies in stratgiesData.data | filter: filter.search | orderBy: query.order | limitTo: query.limit : (query.page -1) * query.limit">
+                      <td md-cell>{{startgies.ranking}}</td>
+                      <td md-cell>{{startgies['strategy sub id']}}</td>
+                      <td md-cell>{{startgies['strategy type']}}</td>
+                      <td md-cell>{{startgies['value date']}}</td>
+                      <td md-cell>{{startgies.ccy}}</td>
+                      <td md-cell>{{startgies['amt generated/invested due to strategy']}}</td>
+                      <td md-cell>{{startgies['required maturity(days)']}}</td>
+                      <td md-cell>{{startgies['minimum investment period(days)']}}</td>
+                      <td md-cell>{{startgies['minimum deposit/borrowing']}}</td>
+                      <td md-cell>{{startgies['minimum deposit ccy']}}</td>
+                      <td md-cell>{{startgies['cost of strategy']}}</td>
+                      <td md-cell>{{startgies['funding required/to be invested']}}</td>
+                      <td md-cell>{{startgies['other cost(tax,vat)']}}</td>
+                      <td md-cell>{{startgies['savings/earnings due to strategy']}}</td>
+                      <td md-cell>{{startgies['time to execute(days)']}}</td>
+                      <td md-cell>{{startgies['risk rating']}}</td>
+                      <td md-cell>{{startgies['uncertainity in cash flows']}}</td>
+                      <td md-cell>{{startgies['source departmentid']}}</td>
+                      <td md-cell>{{startgies.targetdeptid}}</td>
+                      <td md-cell>{{startgies.note}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </md-table-container>
+              <md-table-pagination md-limit="query.limit" md-limit-options="limitOptions" md-page="query.page" md-total="{{cashBlotterData.count}}" md-page-select="options.pageSelect" md-boundary-links="options.boundaryLinks" md-on-paginate="logPagination"></md-table-pagination>
+            </md-card>
+        </md-content>
+        <!-- end STRATEGIES-->
+      </div>
+    </div>
+    <!-- table for UNDERLYING TRANSACTIONS-->
+    <div layout="row" ng-if="tracsactionFlag">
+        <md-content laout="column" flex >
+            <md-card> 
+              <md-toolbar class="md-table-toolbar md-default" ng-hide="options.rowSelection && selected.length">
+                <div class="md-toolbar-tools">
+                  <span>UNDERLYING TRANSACTIONS</span>
+                  <div flex></div>
+                  <md-button class="md-icon-button" ng-click="loadStuff()">
+                    <md-icon>refresh</md-icon>
+                  </md-button>
+                </div>
+              </md-toolbar>
+              <md-table-container>
+                <table md-table  ng-model="selected" md-progress="promise">
+                  <thead ng-if="!options.decapitate" md-head md-order="query.order" md-on-reorder="logOrder">
+                    <tr md-row >
+                      <th md-column  ng-mouseover="test()" ng-repeat="header in transactionHeader" md-order-by="{{header}}"><span>{{header}}</span></th>
+                    </tr>
+                  </thead>
+                  <tbody md-body>
+                    <tr md-row md-select="transaction" md-on-select="logItem" md-auto-select="options.autoSelect" ng-disabled="transaction.calories.value > 400" ng-repeat="transaction in tracsactionsData.data | filter: filter.search | orderBy: query.order | limitTo: query.limit : (query.page -1) * query.limit">
+                      <td md-cell>{{transaction.Entity}}</td>
+                      <td md-cell>{{dessert.Region}}</td>
+                      <td md-cell>{{dessert.Country}}</td>
+                      <td md-cell>{{dessert.Location}}</td>
+                      <td md-cell>{{dessert.Business}}</td>
+                      <td md-cell>{{dessert.Currency}}</td>
+                      <td md-cell>{{dessert.BusinessDate}}</td>
+                      <td md-cell>{{dessert.today}}</td>
+                      <td md-cell>{{dessert.tomorrow}}</td>
+                      <td md-cell>{{dessert.spot}}</td>
+                      <td md-cell>{{dessert['1W']}}</td>
+                      <td md-cell>{{dessert['2W']}}</td>
+                      <td md-cell>{{dessert['1M']}}</td>
+                      <td md-cell>{{dessert['3M']}}</td>
+                      <td md-cell>{{dessert['6M']}}</td>
+                      <td md-cell>{{dessert['1Y']}}</td>
+                      <td md-cell>{{dessert['2Y']}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </md-table-container>
+              <md-table-pagination md-limit="query.limit" md-limit-options="limitOptions" md-page="query.page" md-total="{{cashBlotterData.count}}" md-page-select="options.pageSelect" md-boundary-links="options.boundaryLinks" md-on-paginate="logPagination"></md-table-pagination>
+            </md-card>
+        </md-content>
+    </div>
+
+    <!--end table for UNDERLYING TRANSACTIONS-->
+
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+    <script src="https://rawgit.com/daniel-nagy/md-data-table/master/dist/md-data-table.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+    <script src="./app.js"></script> 
+    <script src="./service.js"></script>
+    <script src="./controller.js"></script>  
+  </body>
+</html>
